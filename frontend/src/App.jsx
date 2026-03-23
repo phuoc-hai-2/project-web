@@ -14,6 +14,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AdminRoute from "./components/AdminRoute";
 import AdminProductAdd from "./pages/AdminProductAdd";
 import AdminProductEdit from "./pages/AdminProductEdit";
+import CategoryPage from "./pages/CategoryPage";
+
 function App() {
   return (
     <BrowserRouter>
@@ -23,6 +25,9 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/cart" element={<Cart />} />
         <Route path="/" element={<Home />} />
+        <Route>
+          <Route path="/category/:slug" element={<CategoryPage />} />
+        </Route>
         <Route path="/product/:id" element={<ProductDetail />} />
         <Route element={<AdminRoute />}>
           <Route path="/admin/product/add" element={<AdminProductAdd />} />

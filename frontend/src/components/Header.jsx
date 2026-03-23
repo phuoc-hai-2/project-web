@@ -10,7 +10,7 @@ import Col from "react-bootstrap/Col";
 
 function Header() {
   const navigate = useNavigate();
-  const [show, setShow] = useState(false);
+  // const [show, setShow] = useState(false);
   const [keyword, setKeyword] = useState("");
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
@@ -44,11 +44,9 @@ function Header() {
                   style={{ width: "200px" }}
                   onClick={() => navigate("/home")}
                 >
-                  <img
-                    src="../src/assets/images/logo.png"
-                    alt="logo"
-                    className="navbar-logo"
-                  />
+                  <h1 style={{ color: "white" }}>
+                    DIGITAL <br /> STORE
+                  </h1>
                 </Navbar.Brand>
 
                 <Navbar.Toggle aria-controls="navbarScroll" />
@@ -125,12 +123,12 @@ function Header() {
                 <div className="menu-wrapper">
                   <button
                     className="category-btn"
-                    onClick={() => setShow(!show)}
+                    onClick={() => navigate("/category/:slug")}
                   >
                     Danh mục
                   </button>
 
-                  {show && (
+                  {/* {show && (
                     <div className="mega-menu">
                       <Container>
                         <Row>
@@ -155,7 +153,7 @@ function Header() {
                         </Row>
                       </Container>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </Row>
             </Col>

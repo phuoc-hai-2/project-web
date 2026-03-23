@@ -36,7 +36,7 @@ const productSchema = mongoose.Schema(
 // MỚI 3: Tạo một trường "ảo" (virtual) tên là countInStock
 // Trường này không lưu trong Database, mà nó tự tính toán dựa trên số Key chưa bán
 productSchema.virtual("availableKeys").get(function () {
-  return (this.digitalVault || []).filter((key) => !key.isUsed);
+  return (this.digitalVault || []).filter((key) => !key.isSold).length;
 });
 
 // Đảm bảo các trường ảo (virtuals) được hiển thị khi xuất ra JSON gửi cho Frontend

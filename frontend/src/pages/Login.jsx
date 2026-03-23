@@ -3,7 +3,7 @@ import { login } from "../services/authService";
 import { useNavigate } from "react-router-dom";
 import Header from "../components/Header";
 import Footer from "../components/Footer";
-function Login() {
+const Login = () => {
   const [form, setForm] = useState({ email: "", password: "" });
   const navigate = useNavigate();
 
@@ -97,5 +97,5 @@ function Login() {
       <Footer />
     </>
   );
-}
+};
 export default Login;
