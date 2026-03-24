@@ -28,6 +28,14 @@ const reviewSchema = mongoose.Schema(
         type: String,
       },
     ],
+
+    status: {
+      type: String,
+      enum: ["pending", "approved", "hidden"],
+      default: "approved",
+    },
+
+    adminReply: { type: String },
   },
   {
     timestamps: true,

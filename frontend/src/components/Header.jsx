@@ -5,12 +5,12 @@ import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
+import NavDropdown from "react-bootstrap/NavDropdown";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 
 function Header() {
   const navigate = useNavigate();
-  // const [show, setShow] = useState(false);
   const [keyword, setKeyword] = useState("");
   const userInfo = JSON.parse(localStorage.getItem("userInfo"));
 
@@ -72,25 +72,24 @@ function Header() {
                   >
                     {userInfo ? (
                       <>
-                        <span className="navbar-text me-3 fw-bold text-primary">
-                          Chào, {userInfo.name}
-                        </span>
-                        {userInfo.role === "admin" && (
-                          <Button
-                            variant="outline-dark"
-                            className="me-2"
-                            onClick={() => navigate("/admin/product/add")}
-                          >
-                            Thêm Sản Phẩm
-                          </Button>
+                        {userInfo.role === "admin" ? (
+                          <NavDropdown title={`👑 ${userInfo.name}`} id="admin-dropdown" className="me-2">
+                            <NavDropdown.Item onClick={() => navigate("/admin")}>📊 Dashboard</NavDropdown.Item>
+                            <NavDropdown.Item onClick={() => navigate("/admin/products")}>📦 Sản phẩm</NavDropdown.Item>
+                            <NavDropdown.Item onClick={() => navigate("/admin/orders")}>🧾 Đơn hàng</NavDropdown.Item>
+                            <NavDropdown.Item onClick={() => navigate("/admin/users")}>👥 Người dùng</NavDropdown.Item>
+                            <NavDropdown.Item onClick={() => navigate("/admin/reviews")}>⭐ Reviews</NavDropdown.Item>
+                            <NavDropdown.Divider />
+                            <NavDropdown.Item onClick={logout} className="text-danger">Đăng xuất</NavDropdown.Item>
+                          </NavDropdown>
+                        ) : (
+                          <NavDropdown title={`👤 ${userInfo.name}`} id="user-dropdown" className="me-2">
+                            <NavDropdown.Item onClick={() => navigate("/profile")}>Hồ sơ cá nhân</NavDropdown.Item>
+                            <NavDropdown.Item onClick={() => navigate("/orders")}>Lịch sử đơn hàng</NavDropdown.Item>
+                            <NavDropdown.Divider />
+                            <NavDropdown.Item onClick={logout} className="text-danger">Đăng xuất</NavDropdown.Item>
+                          </NavDropdown>
                         )}
-                        <Button
-                          variant="outline-danger"
-                          className="me-2"
-                          onClick={logout}
-                        >
-                          Đăng xuất
-                        </Button>
                       </>
                     ) : (
                       <Button
@@ -101,20 +100,12 @@ function Header() {
                         Đăng nhập
                       </Button>
                     )}
-                    {/* <Button
-                      variant="outline-primary"
-                      className="me-2"
-                      onClick={() => navigate("/login")}
-                    >
-                      <i className="bi bi-person-circle me-2"></i>
-                      Đăng nhập
-                    </Button> */}
                     <Button
                       variant="outline-primary"
                       className="me-2"
                       onClick={() => navigate("/cart")}
                     >
-                      Giỏ Hàng
+                      🛒 Giỏ Hàng
                     </Button>
                   </Nav>
                 </Navbar.Collapse>
@@ -127,33 +118,6 @@ function Header() {
                   >
                     Danh mục
                   </button>
-
-                  {/* {show && (
-                    <div className="mega-menu">
-                      <Container>
-                        <Row>
-                          <Col md={3}>
-                            <h5>Danh mục</h5>
-                            <ul></ul>
-                          </Col>
-
-                          <Col md={3}>
-                            <ul></ul>
-                          </Col>
-
-                          <Col md={3}>
-                            <h5>Thương hiệu</h5>
-                            <ul></ul>
-                          </Col>
-
-                          <Col md={3}>
-                            <h5>Tìm kiếm nhiều</h5>
-                            <ul></ul>
-                          </Col>
-                        </Row>
-                      </Container>
-                    </div>
-                  )} */}
                 </div>
               </Row>
             </Col>

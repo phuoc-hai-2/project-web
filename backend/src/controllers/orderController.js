@@ -1,4 +1,6 @@
 import Order from "../models/Order.js";
+import User from "../models/User.js";
+import { sendOrderConfirmationEmail, sendKeyDeliveryEmail, sendRefundEmail } from "../services/emailService.js";
 
 export const addOrderItems = async (req, res) => {
   try {
@@ -19,6 +21,10 @@ export const addOrderItems = async (req, res) => {
       });
 
       const createdOrder = await order.save();
+
+      // Send confirmation email
+      await sendOrderConfirmationEmail(createdOrder, digitalDeliveryInfo.emailReceive);
+
       res.status(201).json(createdOrder);
     }
   } catch (error) {
@@ -44,6 +50,22 @@ export const getMyOrders = async (req, res) => {
   }
 };
 
+export const getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id).populate("user", "name email");
+    if (!order) {
+      return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+    }
+    // Users can only see their own orders
+    if (order.user._id.toString() !== req.user._id.toString() && req.user.role !== "admin") {
+      return res.status(403).json({ message: "Không có quyền xem đơn hàng này" });
+    }
+    res.json(order);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi khi lấy đơn hàng", error: error.message });
+  }
+};
+
 export const updateOrderToDelivered = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
@@ -63,6 +85,13 @@ export const updateOrderToDelivered = async (req, res) => {
       });
 
       const updatedOrder = await order.save();
+
+      // Send key delivery email
+      const user = await User.findById(order.user);
+      if (user) {
+        await sendKeyDeliveryEmail(updatedOrder, order.digitalDeliveryInfo.emailReceive || user.email);
+      }
+
       res.json(updatedOrder);
     } else {
       res.status(404).json({ message: "Không tìm thấy đơn hàng" });
@@ -74,5 +103,76 @@ export const updateOrderToDelivered = async (req, res) => {
         message: "Lỗi khi cập nhật trạng thái đơn hàng",
         error: error.message,
       });
+  }
+};
+
+// Admin: Get all orders
+export const getAllOrders = async (req, res) => {
+  try {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 20;
+    const status = req.query.status;
+
+    const filter = status ? { status } : {};
+    const count = await Order.countDocuments(filter);
+    const orders = await Order.find(filter)
+      .populate("user", "name email")
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip((page - 1) * limit);
+
+    res.json({ orders, page, pages: Math.ceil(count / limit), total: count });
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi khi lấy danh sách đơn hàng", error: error.message });
+  }
+};
+
+// Admin: Update order status
+export const updateOrderStatus = async (req, res) => {
+  try {
+    const { status } = req.body;
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+    }
+
+    order.status = status;
+    if (status === "Completed") {
+      order.completedAt = Date.now();
+    }
+
+    const updatedOrder = await order.save();
+    res.json(updatedOrder);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi khi cập nhật trạng thái", error: error.message });
+  }
+};
+
+// Admin: Refund order
+export const refundOrder = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id);
+
+    if (!order) {
+      return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+    }
+
+    if (!order.isPaid) {
+      return res.status(400).json({ message: "Đơn hàng chưa được thanh toán" });
+    }
+
+    order.status = "Refunded";
+    const updatedOrder = await order.save();
+
+    // Send refund email
+    const user = await User.findById(order.user);
+    if (user) {
+      await sendRefundEmail(updatedOrder, order.digitalDeliveryInfo.emailReceive || user.email);
+    }
+
+    res.json(updatedOrder);
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi khi hoàn tiền", error: error.message });
   }
 };

@@ -14,7 +14,7 @@ const Login = () => {
       const data = res.data;
       localStorage.setItem("userInfo", JSON.stringify(data));
       if (data.role === "admin") {
-        navigate("/admin/product/add");
+        navigate("/admin");
       } else {
         navigate("/home");
       }
@@ -91,6 +91,11 @@ const Login = () => {
             <button className="btn btn-primary w-100" type="submit">
               Login
             </button>
+            <div className="text-center mt-2">
+              <a href="/forgot-password" className="text-decoration-none small">
+                Quên mật khẩu?
+              </a>
+            </div>
           </form>
         </div>
       </div>
