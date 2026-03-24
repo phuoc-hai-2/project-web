@@ -16,6 +16,7 @@ const AdminProductAdd = () => {
   const [description, setDescription] = useState("");
   const [categoryOption, setCategoryOption] = useState("Giải trí");
   const [customCategory, setCustomCategory] = useState("");
+  const [productType, setProductType] = useState("Key");
 
   const uploadFileHandler = async (e) => {
     const file = e.target.files[0];
@@ -47,6 +48,7 @@ const AdminProductAdd = () => {
         image,
         description,
         category: finalCategory,
+        productType,
       });
       alert("Thêm sản phẩm thành công");
       navigate("/");
@@ -122,6 +124,17 @@ const AdminProductAdd = () => {
                     required
                   />
                 )}
+              </Form.Group>
+
+              <Form.Group className="mb-4">
+                <Form.Label className="fw-bold">Loại sản phẩm</Form.Label>
+                <Form.Select
+                  value={productType}
+                  onChange={(e) => setProductType(e.target.value)}
+                >
+                  <option value="Key">Key – Giao mã tự động</option>
+                  <option value="Service">Service – Nâng cấp thủ công</option>
+                </Form.Select>
               </Form.Group>
 
               <Form.Group className="mb-4">
