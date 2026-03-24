@@ -72,9 +72,15 @@ function Header() {
                   >
                     {userInfo ? (
                       <>
-                        <span className="navbar-text me-3 fw-bold text-primary">
-                          Chào, {userInfo.name}
-                        </span>
+                        {/* --- KHI ĐÃ ĐĂNG NHẬP --- */}
+                        <Button
+                          variant="outline-info"
+                          className="me-2 fw-bold"
+                          onClick={() => navigate("/account")}
+                        >
+                          Tài khoản: {userInfo.name}
+                        </Button>
+
                         {userInfo.role === "admin" && (
                           <Button
                             variant="outline-dark"
@@ -84,6 +90,15 @@ function Header() {
                             Thêm Sản Phẩm
                           </Button>
                         )}
+
+                        <Button
+                          variant="outline-success"
+                          className="me-2"
+                          onClick={() => navigate("/order-history")}
+                        >
+                          Lịch sử mua hàng
+                        </Button>
+
                         <Button
                           variant="outline-danger"
                           className="me-2"
@@ -93,22 +108,38 @@ function Header() {
                         </Button>
                       </>
                     ) : (
-                      <Button
-                        variant="outline-primary"
-                        className="me-2"
-                        onClick={() => navigate("/login")}
-                      >
-                        Đăng nhập
-                      </Button>
+                      <>
+                        {/* --- KHI CHƯA ĐĂNG NHẬP --- */}
+                        <Button
+                          variant="outline-secondary"
+                          className="me-2 fw-bold"
+                          disabled
+                          style={{ opacity: 0.6, cursor: "not-allowed" }}
+                        >
+                          Tài khoản
+                        </Button>
+
+                        <Button
+                          variant="outline-secondary"
+                          className="me-2"
+                          disabled
+                          style={{ opacity: 0.6, cursor: "not-allowed" }}
+                          title="Vui lòng đăng nhập để xem đơn hàng"
+                        >
+                          Lịch sử mua hàng
+                        </Button>
+
+                        <Button
+                          variant="outline-primary"
+                          className="me-2"
+                          onClick={() => navigate("/login")}
+                        >
+                          Đăng nhập
+                        </Button>
+                      </>
                     )}
-                    {/* <Button
-                      variant="outline-primary"
-                      className="me-2"
-                      onClick={() => navigate("/login")}
-                    >
-                      <i className="bi bi-person-circle me-2"></i>
-                      Đăng nhập
-                    </Button> */}
+
+                    {/* NÚT GIỎ HÀNG: Ai cũng bấm được, để ngoài cùng */}
                     <Button
                       variant="outline-primary"
                       className="me-2"
@@ -116,23 +147,16 @@ function Header() {
                     >
                       Giỏ Hàng
                     </Button>
-
-                    <Button 
-                      variant="outline-success" 
-                       className="me-2" 
-                      onClick={() => navigate("/order-history")}
-                    >
-                      Lịch sử mua hàng
-                    </Button> 
-
                   </Nav>
                 </Navbar.Collapse>
               </Row>
+              
               <Row>
                 <div className="menu-wrapper">
+                  {/* Sửa lại đường dẫn của Danh mục ở đây */}
                   <button
                     className="category-btn"
-                    onClick={() => navigate("/category/:slug")}
+                    onClick={() => navigate("/category/all")} 
                   >
                     Danh mục
                   </button>

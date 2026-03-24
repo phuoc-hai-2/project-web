@@ -16,13 +16,26 @@ const OrderHistory = () => {
   useEffect(() => {
     const fetchMyOrders = async () => {
       try {
-        // Giả định Backend của bạn có API này để lấy đơn hàng của user đang đăng nhập
-        const { data } = await api.get("/orders/myorders");
+        // 1. Lấy user từ localStorage để móc cái Token ra
+        const userInfo = JSON.parse(localStorage.getItem("userInfo"));
+        
+        // 2. Tạo cái thẻ vé (Header) chứa Token
+        const config = {
+          headers: {
+            Authorization: `Bearer ${userInfo?.token}`, 
+          },
+        };
+
+        // 3. Gửi kèm cái thẻ vé (config) cùng với câu lệnh get
+        const { data } = await api.get("/orders/myorders", config);
+        
         setOrders(data);
       } catch (error) {
         console.error("Lỗi tải lịch sử đơn hàng:", error);
-        // Nếu lỗi do chưa đăng nhập (401), hất về trang login
+        // Nếu Token sai hoặc hết hạn (401), hất về trang login
         if (error.response?.status === 401) {
+          alert("Phiên đăng nhập hết hạn, vui lòng đăng nhập lại!");
+          localStorage.removeItem("userInfo");
           navigate("/login");
         }
       } finally {
