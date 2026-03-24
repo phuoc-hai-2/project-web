@@ -34,7 +34,7 @@ export const createReview = async (req, res) => {
     const { rating, comment, productId } = req.body;
 
     const imageUrls = req.files
-      ? req.files.map((file) => `http://localhost:5000/uploads/${file.filename}`)
+      ? req.files.map((file) => `/uploads/${file.filename}`)
       : [];
 
     const review = await Review.create({

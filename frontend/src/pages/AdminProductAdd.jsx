@@ -50,7 +50,7 @@ const AdminProductAdd = () => {
         productType,
       });
       alert("Thêm sản phẩm thành công");
-      navigate("/");
+      navigate("/admin/products");
     } catch (error) {
       alert("Lỗi thêm sản phẩm");
     }
