@@ -6,6 +6,7 @@ import Container from "react-bootstrap/Container";
 import Form from "react-bootstrap/Form";
 import Button from "react-bootstrap/Button";
 import Card from "react-bootstrap/Card";
+import Spinner from "react-bootstrap/Spinner";
 import Footer from "../components/Footer";
 
 const AdminProductAdd = () => {
@@ -17,29 +18,46 @@ const AdminProductAdd = () => {
   const [categoryOption, setCategoryOption] = useState("Giải trí");
   const [customCategory, setCustomCategory] = useState("");
   const [productType, setProductType] = useState("Key");
+  const [uploading, setUploading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const uploadFileHandler = async (e) => {
     const file = e.target.files[0];
+    if (!file) return;
+
     const formData = new FormData();
     formData.append("image", file);
+
+    setUploading(true);
     try {
       const { data } = await api.post("/upload", formData);
       setImage(data);
     } catch (error) {
-      alert("Lỗi tải ảnh lên");
+      console.error(error);
+      alert(
+        "Lỗi tải ảnh lên: " + (error.response?.data?.message || error.message),
+      );
+    } finally {
+      setUploading(false);
     }
   };
 
   const submitHandler = async (e) => {
     e.preventDefault();
+
+    if (!image) {
+      alert("Vui lòng đợi ảnh tải lên xong hoặc chọn lại ảnh!");
+      return;
+    }
+
     const finalCategory =
       categoryOption === "Khác" ? customCategory : categoryOption;
-
     if (categoryOption === "Khác" && !customCategory.trim()) {
       alert("Vui lòng nhập tên danh mục mới!");
       return;
     }
 
+    setLoading(true);
     try {
       await api.post("/products", {
         name,
@@ -49,10 +67,16 @@ const AdminProductAdd = () => {
         category: finalCategory,
         productType,
       });
-      alert("Thêm sản phẩm thành công");
-      navigate("/admin/products");
+      alert("Thêm sản phẩm thành công!");
+      navigate("/admin");
     } catch (error) {
-      alert("Lỗi thêm sản phẩm");
+      console.error(error);
+      alert(
+        "Lỗi thêm sản phẩm: " +
+          (error.response?.data?.message || "Vui lòng thử lại"),
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -93,6 +117,12 @@ const AdminProductAdd = () => {
                   onChange={uploadFileHandler}
                   required
                 />
+                {uploading && (
+                  <div className="mt-2 text-muted">
+                    <Spinner animation="border" size="sm" className="me-2" />
+                    Đang tải ảnh lên...
+                  </div>
+                )}
               </Form.Group>
 
               <Form.Group className="mb-4">
@@ -152,8 +182,16 @@ const AdminProductAdd = () => {
                 variant="primary"
                 size="lg"
                 className="w-100 fw-bold"
+                disabled={loading || uploading}
               >
-                Lưu Sản Phẩm
+                {loading ? (
+                  <>
+                    <Spinner animation="border" size="sm" className="me-2" />
+                    Đang lưu...
+                  </>
+                ) : (
+                  "Lưu Sản Phẩm"
+                )}
               </Button>
             </Form>
           </Card.Body>
