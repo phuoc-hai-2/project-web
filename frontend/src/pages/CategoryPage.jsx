@@ -49,7 +49,6 @@ function CategoryPage() {
             <h1>Danh mục: {category}</h1>
             <Menu />
 
-            {/* 🔥 FILTER */}
             <div style={{ marginBottom: "20px" }}>
               <input
                 type="number"

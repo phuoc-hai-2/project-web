@@ -7,7 +7,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 import paymentRoutes from "./routes/paymentRoutes.js";
 import uploadRoutes from "./routes/uploadRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
-
+import reviewRoutes from "./routes/reviewRoutes.js";
 const app = express();
 
 app.use(cors());
@@ -18,6 +18,7 @@ app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/payments", paymentRoutes);
 app.use("/api/upload", uploadRoutes);
+app.use("/api/reviews", reviewRoutes);
 app.use("/api", categoryRoutes);
 
 const __dirname = path.resolve();
