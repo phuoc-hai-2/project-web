@@ -116,6 +116,15 @@ function Header() {
                     >
                       Giỏ Hàng
                     </Button>
+
+                    <Button 
+                      variant="outline-success" 
+                       className="me-2" 
+                      onClick={() => navigate("/order-history")}
+                    >
+                      Lịch sử mua hàng
+                    </Button> 
+
                   </Nav>
                 </Navbar.Collapse>
               </Row>

@@ -44,6 +44,28 @@ export const getMyOrders = async (req, res) => {
   }
 };
 
+export const getOrderById = async (req, res) => {
+  try {
+    const order = await Order.findById(req.params.id).populate(
+      'user',
+      'name email'
+    );
+
+    if (order) {
+      // Kiểm tra bảo mật: Chỉ Admin hoặc đúng chủ nhân đơn hàng mới được xem
+      if (req.user.role === 'admin' || order.user._id.toString() === req.user._id.toString()) {
+        res.json(order);
+      } else {
+        res.status(403).json({ message: "Bạn không có quyền xem đơn hàng này" });
+      }
+    } else {
+      res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+    }
+  } catch (error) {
+    res.status(500).json({ message: "Lỗi server khi lấy chi tiết đơn hàng" });
+  }
+};
+
 export const updateOrderToDelivered = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id);
