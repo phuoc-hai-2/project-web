@@ -16,14 +16,15 @@ const AdminProductAdd = () => {
   const [description, setDescription] = useState("");
   const [categoryOption, setCategoryOption] = useState("Giải trí");
   const [customCategory, setCustomCategory] = useState("");
+  const [productType, setProductType] = useState("Key");
 
   const uploadFileHandler = async (e) => {
     const file = e.target.files[0];
     const formData = new FormData();
     formData.append("image", file);
     try {
-      const config = { headers: { "Content-Type": "multipart/form-data" } };
-      const { data } = await api.post("/upload", formData, config);
+      // ✅ Không set Content-Type thủ công — axios tự tạo boundary
+      const { data } = await api.post("/upload", formData);
       setImage(data);
     } catch (error) {
       alert("Lỗi tải ảnh lên");
@@ -47,9 +48,10 @@ const AdminProductAdd = () => {
         image,
         description,
         category: finalCategory,
+        productType,
       });
       alert("Thêm sản phẩm thành công");
-      navigate("/");
+      navigate("/admin");
     } catch (error) {
       alert("Lỗi thêm sản phẩm");
     }
@@ -63,7 +65,7 @@ const AdminProductAdd = () => {
           <Card.Header className="bg-primary text-white text-center py-3">
             <h3 className="mb-0">Thêm Sản Phẩm Mới</h3>
           </Card.Header>
-          <Card.Body className="p-4 ">
+          <Card.Body className="p-4">
             <Form onSubmit={submitHandler}>
               <Form.Group className="mb-4">
                 <Form.Label className="fw-bold">Tên sản phẩm</Form.Label>
@@ -122,6 +124,17 @@ const AdminProductAdd = () => {
                     required
                   />
                 )}
+              </Form.Group>
+
+              <Form.Group className="mb-4">
+                <Form.Label className="fw-bold">Loại sản phẩm</Form.Label>
+                <Form.Select
+                  value={productType}
+                  onChange={(e) => setProductType(e.target.value)}
+                >
+                  <option value="Key">Key – Giao mã tự động</option>
+                  <option value="Service">Service – Nâng cấp thủ công</option>
+                </Form.Select>
               </Form.Group>
 
               <Form.Group className="mb-4">

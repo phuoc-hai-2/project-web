@@ -18,21 +18,17 @@ const storage = multer.diskStorage({
 
 const checkFileType = (file, cb) => {
   const filetypes = /jpg|jpeg|png/;
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-  const mimetype = filetypes.test(file.mimetype);
-
-  if (extname && mimetype) {
-    return cb(null, true);
-  } else {
-    cb("Chỉ cho phép tải lên hình ảnh!");
-  }
+  if (
+    filetypes.test(path.extname(file.originalname).toLowerCase()) &&
+    filetypes.test(file.mimetype)
+  )
+    cb(null, true);
+  else cb("Chỉ cho phép tải lên hình ảnh!");
 };
 
 const upload = multer({
   storage,
-  fileFilter: function (req, file, cb) {
-    checkFileType(file, cb);
-  },
+  fileFilter: (req, file, cb) => checkFileType(file, cb),
 });
 
 router.post("/", upload.single("image"), (req, res) => {

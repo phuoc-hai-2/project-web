@@ -15,6 +15,10 @@ const AdminProductEdit = () => {
   const [image, setImage] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
+  const [productType, setProductType] = useState("Key");
+  const [availableKeys, setAvailableKeys] = useState(0);
+  const [newKeys, setNewKeys] = useState("");
+  const [addingKeys, setAddingKeys] = useState(false);
 
   useEffect(() => {
     const fetchProduct = async () => {
@@ -25,6 +29,8 @@ const AdminProductEdit = () => {
         setImage(data.image);
         setDescription(data.description);
         setCategory(data.category);
+        setProductType(data.productType || "Key");
+        setAvailableKeys(data.availableKeys || 0);
       } catch (error) {
         alert("Không tìm thấy sản phẩm");
         navigate("/");
@@ -55,11 +61,35 @@ const AdminProductEdit = () => {
         image,
         description,
         category,
+        productType,
       });
       alert("Cập nhật sản phẩm thành công");
       navigate("/");
     } catch (error) {
       alert("Lỗi cập nhật sản phẩm");
+    }
+  };
+  const addKeysHandler = async () => {
+    const keyList = newKeys
+      .split("\n")
+      .map((k) => k.trim())
+      .filter((k) => k.length > 0);
+    if (keyList.length === 0) {
+      alert("Vui lòng nhập ít nhất một mã Key!");
+      return;
+    }
+    setAddingKeys(true);
+    try {
+      const { data } = await api.post(`/products/${id}/keys`, {
+        keys: keyList,
+      });
+      alert(data.message);
+      setNewKeys("");
+      setAvailableKeys(data.totalInStock);
+    } catch (error) {
+      alert(error.response?.data?.message || "Lỗi khi nạp Key vào kho");
+    } finally {
+      setAddingKeys(false);
     }
   };
 
@@ -120,6 +150,16 @@ const AdminProductEdit = () => {
               </Form.Group>
 
               <Form.Group className="mb-3">
+                <Form.Label className="fw-bold">Loại sản phẩm</Form.Label>
+                <Form.Select
+                  value={productType}
+                  onChange={(e) => setProductType(e.target.value)}
+                >
+                  <option value="Key">Key – Giao mã tự động</option>
+                  <option value="Service">Service – Nâng cấp thủ công</option>
+                </Form.Select>
+              </Form.Group>
+              <Form.Group className="mb-3">
                 <Form.Label className="fw-bold">Mô tả</Form.Label>
                 <Form.Control
                   as="textarea"
@@ -139,6 +179,35 @@ const AdminProductEdit = () => {
                 Lưu Thay Đổi
               </Button>
             </Form>
+            {productType === "Key" && (
+              <>
+                <hr className="my-4" />
+                <h5 className="fw-bold mb-3">
+                  🔑 Kho Key — Còn lại:{" "}
+                  <span className="text-success">{availableKeys}</span> mã
+                </h5>
+                <Form.Group className="mb-2">
+                  <Form.Label className="fw-bold">
+                    Nạp Key mới (mỗi dòng một mã)
+                  </Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={5}
+                    placeholder={"ABCD-1234-EFGH\nXYZW-5678-MNOP\n..."}
+                    value={newKeys}
+                    onChange={(e) => setNewKeys(e.target.value)}
+                  />
+                </Form.Group>
+                <Button
+                  variant="success"
+                  className="w-100 fw-bold"
+                  onClick={addKeysHandler}
+                  disabled={addingKeys}
+                >
+                  {addingKeys ? "Đang nạp..." : "Nạp Key vào kho"}
+                </Button>
+              </>
+            )}
           </Card.Body>
         </Card>
       </Container>

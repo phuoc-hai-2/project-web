@@ -11,6 +11,7 @@ import Button from "react-bootstrap/Button";
 import Form from "react-bootstrap/Form";
 import Card from "react-bootstrap/Card";
 import Footer from "../components/Footer";
+import ReviewSection from "../components/ReviewSection";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -121,7 +122,7 @@ const ProductDetail = () => {
                       onChange={(e) => setQty(e.target.value)}
                       style={{ width: "80px" }}
                     >
-                      {[...Array(10).keys()].map((x) => (
+                      {[...Array(3).keys()].map((x) => (
                         <option key={x + 1} value={x + 1}>
                           {x + 1}
                         </option>
@@ -152,6 +153,12 @@ const ProductDetail = () => {
                 </ListGroup>
               </Card>
             </Col>
+            <div>
+              <h1>Chi tiết sản phẩm</h1>
+
+              {/* Review */}
+              <ReviewSection productId={id} />
+            </div>
           </Row>
         )}
       </Container>

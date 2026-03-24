@@ -3,8 +3,10 @@ import express from "express";
 import {
   addOrderItems,
   getMyOrders,
-  getOrderById, 
   updateOrderToDelivered,
+  getAllOrders,
+  updateOrderStatus,
+  refundOrder,
 } from "../controllers/orderController.js";
 
 import { protect } from "../middlewares/authMiddleware.js";
@@ -19,11 +21,8 @@ router.post("/", protect, addOrderItems);
 
 // Lấy danh sách lịch sử đơn hàng (Lưu ý: Phải đặt /myorders TRƯỚC /:id)
 router.get("/myorders", protect, getMyOrders);
-
-// Lấy chi tiết đơn hàng để hiện Két Sắt / Key (Đã thêm vào đây)
-router.get("/:id", protect, getOrderById);
-
-// Admin xác nhận đã giao hàng
 router.put("/:id/deliver", protect, admin, updateOrderToDelivered);
+router.put("/:id/status", protect, admin, updateOrderStatus);
+router.put("/:id/refund", protect, admin, refundOrder);
 
 export default router;

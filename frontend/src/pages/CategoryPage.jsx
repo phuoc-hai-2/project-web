@@ -11,6 +11,10 @@ function CategoryPage() {
 
   const [products, setProducts] = useState([]);
   const [category, setCategory] = useState("");
+  const [filtered, setFiltered] = useState([]);
+
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
 
   useEffect(() => {
     fetch(`http://localhost:5000/api/category/${slug}`)
@@ -18,9 +22,23 @@ function CategoryPage() {
       .then((data) => {
         setCategory(data.category);
         setProducts(data.products);
+        setFiltered(data.products);
       })
       .catch((err) => console.log(err));
   }, [slug]);
+  const handleFilter = () => {
+    let result = products;
+
+    if (minPrice) {
+      result = result.filter((p) => p.price >= Number(minPrice));
+    }
+
+    if (maxPrice) {
+      result = result.filter((p) => p.price <= Number(maxPrice));
+    }
+
+    setFiltered(result);
+  };
 
   return (
     <>
@@ -30,11 +48,29 @@ function CategoryPage() {
           <Col>
             <h1>Danh mục: {category}</h1>
             <Menu />
+
+            <div style={{ marginBottom: "20px" }}>
+              <input
+                type="number"
+                placeholder="Giá từ"
+                value={minPrice}
+                onChange={(e) => setMinPrice(e.target.value)}
+              />
+
+              <input
+                type="number"
+                placeholder="Đến"
+                value={maxPrice}
+                onChange={(e) => setMaxPrice(e.target.value)}
+              />
+
+              <button onClick={handleFilter}>Lọc</button>
+            </div>
           </Col>
           <Col>
             <div>
               <div style={{ display: "flex", flexWrap: "wrap", gap: "20px" }}>
-                {products.map((p) => (
+                {filtered.map((p) => (
                   <div
                     key={p._id}
                     style={{ border: "1px solid #ccc", padding: "10px" }}
