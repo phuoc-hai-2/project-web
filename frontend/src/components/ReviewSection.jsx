@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import api from "../api/axios";
 import RatingStats from "./RatingStats";
 function ReviewSection({ productId }) {
   const [reviews, setReviews] = useState([]);
@@ -10,8 +11,9 @@ function ReviewSection({ productId }) {
 
   // 📌 Load review
   const fetchReviews = () => {
-    fetch(`http://localhost:5000/api/reviews/product/${productId}`)
-      .then((res) => res.json())
+    api
+      .get(`/reviews/product/${productId}`)
+      .then((res) => res.data)
       .then((data) => {
         setReviews(data.reviews);
         setAvg(data.avgRating);
@@ -33,10 +35,7 @@ function ReviewSection({ productId }) {
       formData.append("images", img);
     });
 
-    await fetch("http://localhost:5000/api/reviews", {
-      method: "POST",
-      body: formData,
-    });
+    await api.post("/reviews", formData);
 
     setComment("");
     setImages([]);
