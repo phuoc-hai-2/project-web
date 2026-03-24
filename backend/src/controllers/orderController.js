@@ -76,28 +76,7 @@ export const getOrderById = async (req, res) => {
 };
 
 // GET /api/orders/:id  [User/Admin]
-export const getOrderById = async (req, res) => {
-  try {
-    const order = await Order.findById(req.params.id).populate(
-      "user",
-      "name email",
-    );
-    if (!order)
-      return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
-    if (
-      order.user._id.toString() !== req.user._id.toString() &&
-      req.user.role !== "admin"
-    )
-      return res
-        .status(403)
-        .json({ message: "Không có quyền xem đơn hàng này" });
-    res.json(order);
-  } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Lỗi khi lấy đơn hàng", error: error.message });
-  }
-};
+
 
 // PUT /api/orders/:id/deliver  [Admin] - Hoàn thành dịch vụ thủ công
 export const updateOrderToDelivered = async (req, res) => {
