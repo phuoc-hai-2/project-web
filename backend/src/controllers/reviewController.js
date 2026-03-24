@@ -1,52 +1,106 @@
 import Review from "../models/Review.js";
 
+// GET /api/reviews/product/:productId  [Public]
 export const getReviewsByProduct = async (req, res) => {
   try {
     const { productId } = req.params;
+    if (!productId) return res.status(400).json({ message: "Thiếu productId" });
 
-    // 🔥 kiểm tra id hợp lệ
-    if (!productId) {
-      return res.status(400).json({
-        message: "Thiếu productId",
-      });
-    }
-
-    const reviews = await Review.find({ product: productId })
-      .populate("user", "name") // lấy tên user
-      .sort({ createdAt: -1 }); // mới nhất trước
-
-    // 🎯 tính rating trung bình
+    const reviews = await Review.find({
+      product: productId,
+      status: { $ne: "hidden" },
+    })
+      .populate("user", "name")
+      .sort({ createdAt: -1 });
     const avgRating =
       reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length || 0;
-
-    res.status(200).json({
-      count: reviews.length,
-      avgRating: Number(avgRating.toFixed(1)),
-      reviews,
-    });
+    res
+      .status(200)
+      .json({
+        count: reviews.length,
+        avgRating: Number(avgRating.toFixed(1)),
+        reviews,
+      });
   } catch (error) {
-    res.status(500).json({
-      message: error.message,
-    });
+    res.status(500).json({ message: error.message });
   }
 };
+
+// POST /api/reviews  [User - cần đăng nhập]
 export const createReview = async (req, res) => {
   try {
     const { rating, comment, productId } = req.body;
-
-    const imageUrls = req.files.map(
-      (file) => `http://localhost:5000/uploads/${file.filename}`,
-    );
-
+    const imageUrls = req.files
+      ? req.files.map((f) => `http://localhost:5000/uploads/${f.filename}`)
+      : [];
     const review = await Review.create({
-      userId: req.user._id,
+      user: req.user._id,
       product: productId,
       rating,
       comment,
       images: imageUrls,
     });
-
     res.status(201).json(review);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// GET /api/reviews/admin  [Admin]
+export const getAllReviews = async (req, res) => {
+  try {
+    const page = Number(req.query.page) || 1;
+    const limit = Number(req.query.limit) || 20;
+    const filter = req.query.status ? { status: req.query.status } : {};
+    const count = await Review.countDocuments(filter);
+    const reviews = await Review.find(filter)
+      .populate("user", "name email")
+      .populate("product", "name")
+      .sort({ createdAt: -1 })
+      .limit(limit)
+      .skip((page - 1) * limit);
+    res
+      .status(200)
+      .json({ reviews, page, pages: Math.ceil(count / limit), total: count });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// PUT /api/reviews/:id/status  [Admin]
+export const updateReviewStatus = async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review)
+      return res.status(404).json({ message: "Không tìm thấy review" });
+    review.status = req.body.status;
+    res.json(await review.save());
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// PUT /api/reviews/:id/reply  [Admin]
+export const replyToReview = async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review)
+      return res.status(404).json({ message: "Không tìm thấy review" });
+    review.adminReply = req.body.adminReply;
+    res.json(await review.save());
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// DELETE /api/reviews/:id  [Admin]
+export const deleteReview = async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.id);
+    if (!review)
+      return res.status(404).json({ message: "Không tìm thấy review" });
+    await Review.deleteOne({ _id: review._id });
+    res.json({ message: "Đã xóa review thành công" });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

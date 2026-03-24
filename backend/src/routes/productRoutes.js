@@ -12,8 +12,8 @@ import { admin } from "../middlewares/roleMiddleware.js";
 
 const router = express.Router();
 
-router.get("/", getProducts);
-router.get("/:id", getProductById);
+router.get("/", getProducts); // Public
+router.get("/:id", getProductById); // Public
 router.post("/", protect, admin, createProduct);
 router.post("/:id/keys", protect, admin, addKeysToVault);
 router.put("/:id", protect, admin, updateProduct);
