@@ -9,10 +9,15 @@ import uploadRoutes from "./routes/uploadRoutes.js";
 import categoryRoutes from "./routes/categoryRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
 import adminRoutes from "./routes/adminRoutes.js";
+import { apiLimiter } from "./middlewares/rateLimitMiddleware.js";
+
 const app = express();
 
 app.use(cors());
 app.use(express.json());
+
+// Apply general rate limiter to all API routes
+app.use("/api", apiLimiter);
 
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
