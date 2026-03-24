@@ -25,7 +25,7 @@ export const getProductById = async (req, res) => {
 
 export const createProduct = async (req, res) => {
   try {
-    const { name, price, image, description, category, productType } = req.body;
+    const { name, price, image, description, category, productType, status, tags, seoTitle, seoDescription } = req.body;
 
     const product = new Product({
       name,
@@ -34,6 +34,10 @@ export const createProduct = async (req, res) => {
       category,
       description,
       productType: productType || "Key",
+      status: status || "Published",
+      tags: tags || [],
+      seoTitle: seoTitle || "",
+      seoDescription: seoDescription || "",
       digitalVault: [],
     });
 
@@ -82,7 +86,7 @@ export const addKeysToVault = async (req, res) => {
 
 export const updateProduct = async (req, res) => {
   try {
-    const { name, price, image, description, category, productType } = req.body;
+    const { name, price, image, description, category, productType, status, tags, seoTitle, seoDescription } = req.body;
     const product = await Product.findById(req.params.id);
 
     if (product) {
@@ -92,6 +96,10 @@ export const updateProduct = async (req, res) => {
       product.description = description || product.description;
       product.category = category || product.category;
       product.productType = productType || product.productType;
+      if (status !== undefined) product.status = status;
+      if (tags !== undefined) product.tags = tags;
+      if (seoTitle !== undefined) product.seoTitle = seoTitle;
+      if (seoDescription !== undefined) product.seoDescription = seoDescription;
 
       const updatedProduct = await product.save();
       res.json(updatedProduct);

@@ -27,6 +27,20 @@ const productSchema = mongoose.Schema(
     // MỚI 2: KHO CHỨA BÍ MẬT (Digital Vault) - Chứa mảng các mã Key
     // CỰC KỲ QUAN TRỌNG: Dữ liệu này tuyệt đối không được gửi thẳng ra API cho khách xem
     digitalVault: [keySchema],
+
+    // Trạng thái sản phẩm
+    status: {
+      type: String,
+      enum: ["Draft", "Published", "Hidden"],
+      default: "Published",
+    },
+
+    // Tags
+    tags: [{ type: String }],
+
+    // SEO
+    seoTitle: { type: String },
+    seoDescription: { type: String },
   },
   {
     timestamps: true,

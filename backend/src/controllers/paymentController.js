@@ -89,17 +89,23 @@ export const vnpayReturn = async (req, res) => {
       // 5. Lưu đơn hàng
       await order.save();
 
+      // Send email notification
+      const user = await (await import('../models/User.js')).default.findById(order.user);
+      if (user) {
+        const { sendKeyDeliveryEmail } = await import('../services/emailService.js');
+        await sendKeyDeliveryEmail(order, order.digitalDeliveryInfo.emailReceive || user.email);
+      }
+
       // Chuyển hướng khách hàng về trang Frontend báo thành công
-      // (Thay bằng URL trang web React/Vue của bạn sau này)
-      res.status(200).json({ 
-        message: 'Thanh toán thành công! Mã Key đã được giao trong đơn hàng.',
-        order: order 
-      });
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      res.redirect(`${frontendUrl}/payment/vnpay-return?success=true&orderId=${order._id}`);
 
     } else {
-      res.status(400).json({ message: 'Khách hàng hủy thanh toán hoặc thanh toán thất bại' });
+      const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+      res.redirect(`${frontendUrl}/payment/vnpay-return?success=false`);
     }
   } catch (error) {
-    res.status(500).json({ message: 'Lỗi hệ thống khi giao hàng', error: error.message });
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    res.redirect(`${frontendUrl}/payment/vnpay-return?success=false&error=${encodeURIComponent(error.message)}`);
   }
 };

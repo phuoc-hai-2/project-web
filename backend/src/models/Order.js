@@ -56,7 +56,7 @@ const orderSchema = mongoose.Schema(
     status: { 
       type: String, 
       required: true, 
-      enum: ['Pending', 'Processing', 'Completed', 'Cancelled'], // Chờ thanh toán -> Đang xử lý -> Hoàn thành -> Hủy
+      enum: ['Pending', 'Processing', 'Completed', 'Cancelled', 'Refunded'],
       default: 'Pending' 
     },
     completedAt: { type: Date }, // Thời điểm hoàn tất giao Key/Nâng cấp
