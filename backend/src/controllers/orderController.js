@@ -53,29 +53,30 @@ export const getMyOrders = async (req, res) => {
   }
 };
 
-// GET /api/orders/:id  [User/Admin]
 export const getOrderById = async (req, res) => {
   try {
     const order = await Order.findById(req.params.id).populate(
-      "user",
-      "name email",
+      'user',
+      'name email'
     );
-    if (!order)
-      return res.status(404).json({ message: "Không tìm thấy đơn hàng" });
-    if (
-      order.user._id.toString() !== req.user._id.toString() &&
-      req.user.role !== "admin"
-    )
-      return res
-        .status(403)
-        .json({ message: "Không có quyền xem đơn hàng này" });
-    res.json(order);
+
+    if (order) {
+      // Kiểm tra bảo mật: Chỉ Admin hoặc đúng chủ nhân đơn hàng mới được xem
+      if (req.user.role === 'admin' || order.user._id.toString() === req.user._id.toString()) {
+        res.json(order);
+      } else {
+        res.status(403).json({ message: "Bạn không có quyền xem đơn hàng này" });
+      }
+    } else {
+      res.status(404).json({ message: "Không tìm thấy đơn hàng" });
+    }
   } catch (error) {
-    res
-      .status(500)
-      .json({ message: "Lỗi khi lấy đơn hàng", error: error.message });
+    res.status(500).json({ message: "Lỗi server khi lấy chi tiết đơn hàng" });
   }
 };
+
+// GET /api/orders/:id  [User/Admin]
+
 
 // PUT /api/orders/:id/deliver  [Admin] - Hoàn thành dịch vụ thủ công
 export const updateOrderToDelivered = async (req, res) => {

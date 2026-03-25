@@ -15,6 +15,9 @@ import AdminRoute from "./components/AdminRoute";
 import AdminProductAdd from "./pages/AdminProductAdd";
 import AdminProductEdit from "./pages/AdminProductEdit";
 import CategoryPage from "./pages/CategoryPage";
+import OrderHistory from "./pages/OrderHistory";
+import OrderDetail from "./pages/OrderDetail";
+import Account from "./pages/Account";
 
 function App() {
   return (
@@ -29,6 +32,13 @@ function App() {
           <Route path="/category/:slug" element={<CategoryPage />} />
         </Route>
         <Route path="/product/:id" element={<ProductDetail />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/order-history" element={<OrderHistory />} />
+          <Route path="/order/:id" element={<OrderDetail />} />
+          <Route path="/account" element={<Account />} />
+        </Route>
+
         <Route element={<AdminRoute />}>
           <Route path="/admin/product/add" element={<AdminProductAdd />} />
           <Route
