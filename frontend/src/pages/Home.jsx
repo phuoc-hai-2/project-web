@@ -3,7 +3,6 @@ import ProductCard from "../components/ProductCard";
 import { useProducts } from "../hooks/useProduct";
 import Container from "react-bootstrap/Container";
 import Footer from "../components/Footer";
-import Carousel from "react-bootstrap/Carousel";
 import Row from "react-bootstrap/Row";
 import Col from "react-bootstrap/Col";
 import Banner from "../components/banner";

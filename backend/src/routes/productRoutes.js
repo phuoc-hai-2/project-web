@@ -15,6 +15,7 @@ const router = express.Router();
 router.get("/", getProducts); // Public
 router.get("/:id", getProductById); // Public
 router.post("/", protect, admin, createProduct);
+// router.post("/", protect, admin, createProduct);
 router.post("/:id/keys", protect, admin, addKeysToVault);
 router.put("/:id", protect, admin, updateProduct);
 router.delete("/:id", protect, admin, deleteProduct);
